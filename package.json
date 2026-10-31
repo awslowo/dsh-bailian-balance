@@ -1,0 +1,29 @@
+{
+  "name": "dsh-bailian-balance",
+  "version": "0.1.0",
+  "description": "阿里云百炼余额桥（DSH 插件）：用 AK/SK 签名查询 BSS QueryAccountBalance，在本机回环端口暴露 JSON，供 dsh-whale-widget 的「自定义 HTTP」厂商直接读取。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "keywords": ["dsh", "dsh-plugin", "deepseek-harness", "aliyun", "bailian", "balance"],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": { "optional": true }
+  }
+}
