@@ -76,10 +76,25 @@ dsh plugin --profile desktop add link:C:\DSH\dsh-bailian-balance
 | --- | --- |
 | 鲸鱼显示 `—` | `curl http://127.0.0.1:18765/health` 看 `lastError` |
 | `NoCredentials` | DSH 凭据里没有 `ALIYUN_BILLING_AK` / `ALIYUN_BILLING_SK`（和 dsh-aliyun-balance 共用） |
-| 端口占用 | 日志里的 `server-error` / `port-busy`，改插件 `config.port` |
+| 端口占用 | 现在会自动退避重试（最多约 30 秒）；仍失败就改 `port`。插件热更新时新实例先起、旧实例后释放，重试就是为这个场景 |
 | 签名错误 | 不要在 `bss-client.js` 里调换 CanonicalRequest 的行序；换行多一个都会 `SignatureDoesNotMatch` |
 
 日志：`%USERPROFILE%\.dsh\.dsh-bailian-balance.log`（200 行环形，只记事件与错误码，**不记密钥**）。
+
+## 速率与运行期设置
+
+默认 **1 分钟**缓存（`refreshMs: 60000`），懒刷新 + 单飞，DSH 启动时预热一次。
+
+改频率不用重新发布插件 —— 写一个设置文件即可（改完重新挂载/重启生效）：
+
+`%USERPROFILE%\.dsh\.dsh-bailian-balance-settings.json`
+
+```json
+{ "refreshMs": 60000, "includeCoupons": true, "port": 18765 }
+```
+
+优先级：插件 `config`（cordis.patch.yml） > 设置文件 > 环境变量 `DSH_BAILIAN_REFRESH_MS` > 代码默认值。
+注意 `refreshMs` 下限 5000，防止打爆 BSS 接口。
 
 ## 安全边界
 
@@ -89,7 +104,7 @@ dsh plugin --profile desktop add link:C:\DSH\dsh-bailian-balance
 
 ## 速率
 
-默认 5 分钟缓存（`refreshMs: 300000`），懒刷新 + 单飞。DSH 启动时预热一次。
+见上一节「速率与运行期设置」：默认 1 分钟，可用设置文件改。
 
 ## 许可
 
